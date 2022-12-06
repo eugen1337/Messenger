@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.Scanner;
 import message.Message;
 
-public class Client {
+public class Client2 {
 
     InputStream in;
     OutputStream out;
@@ -26,13 +26,10 @@ public class Client {
         message = (Message) in.readObject();
         System.out.println(message.getText());
         */
-        String text = scanner.nextLine();
-        String name = scanner.nextLine(); //get name by client
-        message = new Message(text, name);
-        out.writeObject(message);
-        out.flush();
-        in.readObject();
 
+
+        message = (Message) in.readObject(); // get "type name" from server
+        System.out.println(message.getText());
     }
 
 }

@@ -1,52 +1,99 @@
 package server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
+
+import client.messenger.Client;
+import message.Message;
 
 public class Server {
 
-    private static Clients clientAccept(ServerSocket serverSocket) throws IOException {
+    private static Clients clientAccept(ServerSocket serverSocket) throws IOException, ClassNotFoundException {
         Socket socket = serverSocket.accept();
-        OutputStream out = socket.getOutputStream();
-        InputStream in = socket.getInputStream();
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-        stringWrite(out, "Type your name\n");
-        String name = stringRead(in);
-        stringWrite(out, "Hello " + name);
+        Message message = new Message("Type your name");
+        out.writeObject(message);
+
+        message = (Message) in.readObject(); // get name from client
+        String name = message.getText();
+
+        //stringWrite(out, "Hello " + name);
         Clients client = new Clients(out, in);
+        Model.clients.put(name, client);
+
+        //very useful string
+        //ClientThread ct = new ClientThread(client);
+
+
         Clients.count ++;
         System.out.println("Client #" + Clients.count + " is accepted - ");
         System.out.println(name);
+
         return client;
     }
 
-    public static void main(String[] args) throws IOException {
+// relocate to model
+   class ClientThread extends Thread
+   {
+       Clients client;
+       ClientThread(Clients client)
+       {
+           this.client = client;
+       }
+
+       public static void sendMessage(Clients sendingClient) throws IOException, ClassNotFoundException {
+           Message message = (Message) sendingClient.in.readObject(); // get message from every client by thread
+           if(Model.clients.get(message.getName()) != null) { // if client exist
+               Clients receivingClient = Model.clients.get(message.getName()); // get client object by key - name
+               receivingClient.out.writeObject(message);
+           }
+       }
+       @Override
+       public void run() {
+           while (true) {
+               try {
+                   sendMessage(client);
+               } catch (IOException e) {
+                   throw new RuntimeException(e);
+               } catch (ClassNotFoundException e) {
+                   throw new RuntimeException(e);
+               }
+           }
+       }
+   }
+
+
+
+    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         ServerSocket serverSocket = new ServerSocket(8000);
         System.out.println("Server launched");
-        Clients[] clients = new Clients[10];
+
         new Thread(() -> {
             while(true)
             {
                 try {
-                    clients[Clients.count] = clientAccept(serverSocket);
-                } catch (IOException e) {
+                    clientAccept(serverSocket);
+                } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             }
         }).start();
-        /*
-        for(Clients client : clients)
-        {
-            client.name = stringRead(client.in);
-        }
-*/
 
-        //clients[0] = clientAccept(serverSocket);
-        //clients[1] = clientAccept(serverSocket);
+        //test
+        Thread.sleep(40 * 1000);
+        try {
+            ClientThread.sendMessage(Model.clients.get("LOL"));
+        }
+        catch (IOException e){
+            System.out.println("exception" + e.getLocalizedMessage());
+        }
+        catch (ClassNotFoundException e){
+            System.out.println("exception" + e.getLocalizedMessage());
+        }
+        System.out.println("END");
     }
 
     public static void stringWrite(OutputStream out, String str) throws IOException {
