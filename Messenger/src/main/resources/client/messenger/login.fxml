@@ -7,12 +7,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/18" fx:controller="client.messenger.HelloController">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.messenger.controllers.LoginController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.199951171875" minWidth="10.0" prefWidth="145.5999755859375" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="303.2" minWidth="10.0" prefWidth="260.7999755859375" />
@@ -26,27 +25,27 @@
    <children>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <children>
-            <TextField prefWidth="239.0" />
-            <PasswordField />
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
-               <children>
-                  <Button mnemonicParsing="false" prefHeight="32.0" prefWidth="118.0" text="Вход">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Button>
-                  <Button mnemonicParsing="false" prefHeight="37.0" prefWidth="118.0" text="Регистрация">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Button>
-               </children>
-            </HBox>
+            <TextField fx:id="login" promptText="Логин">
+               <font>
+                  <Font size="14.0" />
+               </font></TextField>
+            <PasswordField fx:id="password" promptText="Пароль">
+               <font>
+                  <Font size="14.0" />
+               </font></PasswordField>
+            <Button mnemonicParsing="false" onAction="#onLoginClicked" prefHeight="25.0" prefWidth="118.0" text="Вход">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
          </children>
+         <padding>
+            <Insets left="15.0" right="15.0" />
+         </padding>
       </VBox>
       <VBox alignment="BOTTOM_CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
          <children>
-            <Label text="Вход/Регистрация">
+            <Label text="Авторизация">
                <font>
                   <Font size="18.0" />
                </font>
@@ -57,6 +56,26 @@
          </opaqueInsets>
          <padding>
             <Insets bottom="15.0" />
+         </padding>
+      </VBox>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <children>
+            <Label text="Ещё не зарегистрированы?">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Button fx:id="register" mnemonicParsing="false" onAction="#onRegisterClicked" prefHeight="25.0" prefWidth="118.0" text="Регистрация">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets bottom="20.0" />
          </padding>
       </VBox>
    </children>
