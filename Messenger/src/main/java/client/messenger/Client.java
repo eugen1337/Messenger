@@ -1,16 +1,18 @@
 package client.messenger;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.Scanner;
 import message.Message;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 public class Client {
 
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    public Client() throws IOException {
+    public Client() {
         try {
             socket = new Socket("127.0.0.1", 8000);
             out = new ObjectOutputStream(socket.getOutputStream());
@@ -27,10 +29,9 @@ public class Client {
     }
 
     public Message receive() throws IOException, ClassNotFoundException {
-         Message message = (Message) in.readObject();
-         return message;
+        return (Message) in.readObject();
     }
-    public void receivingFromServer()
+    /*public void receivingFromServer()
     {
         new Thread(() -> {
             while (socket.isConnected()) {
@@ -43,5 +44,5 @@ public class Client {
                 }
             }
         });
-    }
+    } */
 }
