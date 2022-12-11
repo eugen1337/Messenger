@@ -7,32 +7,28 @@ import message.Message;
 
 public class Client {
 
-    InputStream in;
-    OutputStream out;
+    private Socket socket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        Socket s = new Socket("127.0.0.1", 8000);
-        ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
-        Scanner scanner = new Scanner(System.in);
-
-        Message message = (Message) in.readObject(); // get "type name" from server
-        System.out.println(message.getText());
-
-        message = new Message(scanner.nextLine()); //get name by client
+    public void send(Message message) throws IOException {
         out.writeObject(message);
-        out.flush();
-        /*
-        message = (Message) in.readObject();
-        System.out.println(message.getText());
-        */
-        String text = scanner.nextLine();
-        String name = scanner.nextLine(); //get name by client
-        message = new Message(text, name);
-        out.writeObject(message);
-        out.flush();
-        in.readObject();
+    }
 
+    public Message receive() throws IOException, ClassNotFoundException {
+         Message message = (Message) in.readObject();
+         return message;
+    }
+
+    public Client() throws IOException {
+        try {
+            socket = new Socket("127.0.0.1", 8000);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            System.out.println("Error creating Client");
+            throw new RuntimeException(e);
+        }
     }
 
 }
