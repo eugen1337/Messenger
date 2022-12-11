@@ -10,16 +10,6 @@ public class Client {
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-
-    public void send(Message message) throws IOException {
-        out.writeObject(message);
-    }
-
-    public Message receive() throws IOException, ClassNotFoundException {
-         Message message = (Message) in.readObject();
-         return message;
-    }
-
     public Client() throws IOException {
         try {
             socket = new Socket("127.0.0.1", 8000);
@@ -31,4 +21,27 @@ public class Client {
         }
     }
 
+    public void send(Message message) throws IOException {
+        out.writeObject(message);
+        out.flush();
+    }
+
+    public Message receive() throws IOException, ClassNotFoundException {
+         Message message = (Message) in.readObject();
+         return message;
+    }
+    public void receivingFromServer()
+    {
+        new Thread(() -> {
+            while (socket.isConnected()) {
+                try {
+                    Controller.addMessage(receive().getText());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
 }
