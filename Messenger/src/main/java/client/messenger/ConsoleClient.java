@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.Scanner;
 import message.Message;
 
-public class Client2 {
+public class ConsoleClient {
 
     InputStream in;
     OutputStream out;

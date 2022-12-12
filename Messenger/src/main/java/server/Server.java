@@ -25,6 +25,7 @@ public class Server {
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
         Clients client;
+        String name = "default";
 /*
 
         Message message = new Message("Type your name");
@@ -37,11 +38,21 @@ public class Server {
 
 */
 
-        String name = login(in, out);
+        Message message = (Message) in.readObject(); // get login from client
+        String action = message.getText();
+        switch (action) {
+            case "logging":
+                System.out.println("LOLOLGIN");
+                name = login(in, out);
+
+                break;
+            case "register":
+                name = register(in, out);
+                break;
+        }
+
         client = new Clients(out, in);
         Model.clients.put(name, client);
-
-
 
         Clients.count ++;
         /*System.out.println("Client #" + Clients.count + " is accepted - ");
@@ -53,14 +64,16 @@ public class Server {
 
 
     private static String login(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        System.out.println("LOGIN");
         Message message = (Message) in.readObject(); // get login from client
         String name = message.getText();
 
-        message = (Message) in.readObject(); // get login from client
+        message = (Message) in.readObject(); // get password from client
         String password = message.getText();
 
         message = new Message("success");
         out.writeObject(message);
+        out.flush();
 
         System.out.println("Client #" + Clients.count + " is accepted - ");
         System.out.println(name);
@@ -68,6 +81,10 @@ public class Server {
     }
 
 
+    private static String register(ObjectInputStream in, ObjectOutputStream out)
+    {
+        return "";
+    }
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         ServerSocket serverSocket = new ServerSocket(8000);
         System.out.println("Server launched");

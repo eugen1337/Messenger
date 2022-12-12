@@ -16,7 +16,7 @@ public class Model {
     public void setCT(int num, Clients client)
     {
         ClientThread ct = new ClientThread(client);
-        clientThreads.set(num, ct);
+        clientThreads.add(ct);
     }
 
     class ClientThread extends Thread
