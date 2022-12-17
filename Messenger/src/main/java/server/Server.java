@@ -57,18 +57,20 @@ public class Server {
 
 
 
-    private static String login(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    private static String login(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, SQLException {
         System.out.println("LOGIN");
 
-        String name = receive(in).getText(); // get login from client
+        String login = receive(in).getText(); // get login from client
 
         String password = receive(in).getText(); // get password from client
 
-        send(out, new Message("success"));
-
+        if(dbHandler.getUser(login, password) != null)
+            send(out, new Message("success"));
+        else
+            send(out, new Message("error"));
         System.out.println("Client #" + Clients.count + " is accepted - ");
-        System.out.println(name);
-        return name;
+        System.out.println(login);
+        return login;
     }
 
 
@@ -78,7 +80,8 @@ public class Server {
         String login = receive(in).getText(); // get login from client
 
         String password = receive(in).getText(); // get password from client
-        dbHandler.signUp(login, password, "default");
+
+        dbHandler.signUp(login, password, "Oleg");
 
         send(out, new Message("success"));
 
@@ -86,6 +89,7 @@ public class Server {
         System.out.println(login);
         return login;
     }
+
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         ServerSocket serverSocket = new ServerSocket(8000);
         System.out.println("Server launched");

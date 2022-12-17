@@ -1,9 +1,6 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DBHandler extends Configs{
     Connection dbConnection;
@@ -27,4 +24,19 @@ public class DBHandler extends Configs{
 
         prState.executeUpdate();
     }
+
+    public ResultSet getUser(String login, String password) throws SQLException {
+        ResultSet resSet = null;
+
+        String selectQuery = "SELECT * FROM " + Constants.USER_TABLE + " WHERE " +
+                Constants.USERS_LOGIN + "=? AND " + Constants.USERS_PASSWORD + "=?";
+        PreparedStatement prState = getDbConnection().prepareStatement(selectQuery);
+        prState.setString(1, login);
+        prState.setString(2, password);
+
+        resSet = prState.executeQuery();
+
+        return resSet;
+    }
+
 }
