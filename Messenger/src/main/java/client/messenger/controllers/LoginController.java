@@ -1,21 +1,21 @@
-package client.messenger;
+package client.messenger.controllers;
 
+import client.messenger.Client;
+import client.messenger.HelloApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import message.Message;
 
 import java.io.IOException;
 
-public class Controller {
+public class LoginController {
     private static Client client;
     @FXML
     private TextField login;
@@ -25,13 +25,9 @@ public class Controller {
     private Label info;
     @FXML
     private Button register;
-    private static boolean clientIsCreated = false;
 
     public void initialize() throws IOException {
-        if(!clientIsCreated) {
-            client = new Client();
-        }
-        clientIsCreated = true;
+        client = new Client();
     }
 
     @FXML
@@ -56,24 +52,15 @@ public class Controller {
                 message = new Message(password.getText());
                 client.send(message);
                 if (client.receive().getText() == "success") {
-                    //Close current
                     Stage stage = (Stage) login.getScene().getWindow();
-                    // do what you have to do
-                    stage.close();
                     FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main.fxml"));
-                System.out.println(fxmlLoader);
+                    fxmlLoader.setController(new MainController(client));
                     Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-                    System.out.println(scene);
-                    //Parent root1 = (Parent) fxmlLoader.load();
-                    stage = new Stage();
                     stage.setTitle("Missenger");
                     stage.setScene(scene);
-                    stage.show();
-                System.out.println("MAIN");
                 }
             }
             catch (IOException | ClassNotFoundException e) {
-                System.out.println("MAIN");
                 throw new RuntimeException(e);
             }
         }
@@ -82,18 +69,12 @@ public class Controller {
 
     @FXML
     public void onRegisterClicked(ActionEvent actionEvent) throws IOException {
-        //Close current
         Stage stage = (Stage) register.getScene().getWindow();
-        // do what you have to do
-        //stage.close();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("register.fxml"));
+        fxmlLoader.setController(new RegisterController(client));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-        //Parent root1 = (Parent) fxmlLoader.load();
-        //stage = new Stage();
-        //stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle("Регистрация");
+        stage.setTitle("Missenger: Регистрация");
         stage.setScene(scene);
-        //stage.show();
     }
 
 }
