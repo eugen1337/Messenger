@@ -4,7 +4,7 @@ import client.messenger.Client;
 
 public class MainController {
     private Client client;
-    MainController(Client client) {
+    void setClient(Client client) {
         this.client = client;
     }
 }

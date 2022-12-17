@@ -46,18 +46,21 @@ public class LoginController {
             Message message = new Message("logging");
             try {
                 client.send(message);
-
                 message = new Message(login.getText());
                 client.send(message);
                 message = new Message(password.getText());
                 client.send(message);
-                if (client.receive().getText() == "success") {
+                if (client.receive().getText().equals("success")) {
                     Stage stage = (Stage) login.getScene().getWindow();
                     FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main.fxml"));
-                    fxmlLoader.setController(new MainController(client));
                     Scene scene = new Scene(fxmlLoader.load(), 600, 400);
                     stage.setTitle("Missenger");
                     stage.setScene(scene);
+                    MainController controller = fxmlLoader.getController();
+                    controller.setClient(client);
+                }
+                else {
+                    info.setText("Такого пользователя не существует или пароль неверный");
                 }
             }
             catch (IOException | ClassNotFoundException e) {
@@ -71,10 +74,10 @@ public class LoginController {
     public void onRegisterClicked(ActionEvent actionEvent) throws IOException {
         Stage stage = (Stage) register.getScene().getWindow();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("register.fxml"));
-        fxmlLoader.setController(new RegisterController(client));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("Missenger: Регистрация");
         stage.setScene(scene);
+        RegisterController controller = fxmlLoader.getController();
+        controller.setClient(client);
     }
-
 }
