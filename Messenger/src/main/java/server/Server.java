@@ -3,23 +3,18 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
+
 
 import client.messenger.Client;
+import database.DBHandler;
 import message.Message;
 
 public class Server {
 
-    public void sendToClient(Message message, ObjectOutputStream out) throws IOException {
-        out.writeObject(message);
-        out.flush();
-    }
+    private static DBHandler dbHandler = new DBHandler();
 
-    public Message receiveFromClient(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        Message message = (Message) in.readObject();
-        return message;
-    }
-
-    private static Clients clientAccept(ServerSocket serverSocket) throws IOException, ClassNotFoundException {
+    private static Clients clientAccept(ServerSocket serverSocket) throws IOException, ClassNotFoundException, SQLException {
         Socket socket = serverSocket.accept();
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
@@ -42,9 +37,7 @@ public class Server {
         String action = message.getText();
         switch (action) {
             case "logging":
-                System.out.println("LOLOLGIN");
                 name = login(in, out);
-
                 break;
             case "register":
                 name = register(in, out);
@@ -63,17 +56,15 @@ public class Server {
 
 
 
+
     private static String login(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         System.out.println("LOGIN");
-        Message message = (Message) in.readObject(); // get login from client
-        String name = message.getText();
 
-        message = (Message) in.readObject(); // get password from client
-        String password = message.getText();
+        String name = receive(in).getText(); // get login from client
 
-        message = new Message("success");
-        out.writeObject(message);
-        out.flush();
+        String password = receive(in).getText(); // get password from client
+
+        send(out, new Message("success"));
 
         System.out.println("Client #" + Clients.count + " is accepted - ");
         System.out.println(name);
@@ -81,14 +72,25 @@ public class Server {
     }
 
 
-    private static String register(ObjectInputStream in, ObjectOutputStream out)
-    {
-        return "";
+    private static String register(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, SQLException {
+        System.out.println("Register");
+
+        String login = receive(in).getText(); // get login from client
+
+        String password = receive(in).getText(); // get password from client
+        dbHandler.signUp(login, password, "default");
+
+        send(out, new Message("success"));
+
+        System.out.println("Client #" + Clients.count + " is accepted - ");
+        System.out.println(login);
+        return login;
     }
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         ServerSocket serverSocket = new ServerSocket(8000);
         System.out.println("Server launched");
         Model model = new Model();
+        DBHandler dbHandler = new DBHandler();
 
         new Thread(() -> {
             while(true)
@@ -97,7 +99,7 @@ public class Server {
                     model.setCT(Clients.count,
                             clientAccept(serverSocket)
                     );
-                } catch (IOException | ClassNotFoundException e) {
+                } catch (IOException | ClassNotFoundException | SQLException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -118,18 +120,14 @@ public class Server {
         System.out.println("END");
         */
 
+
+    }
+    public static void send(ObjectOutputStream out, Message message) throws IOException {
+        out.writeObject(message);
+        out.flush();
     }
 
-    public static void stringWrite(OutputStream out, String str) throws IOException {
-        int count = str.length();
-        out.write(count);
-        byte[] b = str.getBytes();
-        out.write(b);
-    }
-    public static String stringRead(InputStream in) throws IOException {
-        int count = in.read();
-        byte[] b = new byte[count];
-        in.read(b);
-        return new String(b);
+    public static Message receive(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        return (Message) in.readObject();
     }
 }
