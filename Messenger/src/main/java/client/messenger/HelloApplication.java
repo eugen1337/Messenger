@@ -1,5 +1,6 @@
 package client.messenger;
 
+import client.messenger.controllers.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,7 +16,17 @@ public class HelloApplication extends Application {
         stage.setTitle("Missenger: Авторизация");
         stage.setScene(scene);
         stage.setResizable(false);
+
+        stage.setOnCloseRequest(e -> {
+            try {
+                MainController.shutdown();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
         stage.show();
+
     }
 
     public static void main(String[] args) {

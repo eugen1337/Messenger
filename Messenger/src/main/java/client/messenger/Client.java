@@ -1,5 +1,7 @@
 package client.messenger;
 
+import client.messenger.controllers.MainController;
+import javafx.application.Platform;
 import message.Message;
 
 import java.io.IOException;
@@ -9,9 +11,9 @@ import java.net.Socket;
 
 public class Client {
 
-    private Socket socket;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
+    public static Socket socket;
+    public ObjectInputStream in;
+    public ObjectOutputStream out;
     public Client() {
         try {
             socket = new Socket("127.0.0.1", 8000);
@@ -33,18 +35,4 @@ public class Client {
         return (Message) in.readObject();
     }
 
-    /*public void receivingFromServer()
-    {
-        new Thread(() -> {
-            while (socket.isConnected()) {
-                try {
-                    Controller.addMessage(receive().getText());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    } */
 }
