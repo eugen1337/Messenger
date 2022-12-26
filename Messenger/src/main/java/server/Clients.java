@@ -13,4 +13,6 @@ public class Clients {
     public ObjectOutputStream out;
     public ObjectInputStream in;
     public Socket socket;
+
+    public String login;
 }

@@ -54,6 +54,7 @@ public class Model {
         }
 
         client = new Clients(clientSocket,out, in);
+        client.login = name;
         Model.clients.put(name, client);
 
         Clients.count ++;

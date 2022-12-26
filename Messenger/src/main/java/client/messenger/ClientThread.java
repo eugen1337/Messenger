@@ -20,8 +20,6 @@ public class ClientThread extends Thread {
     public void run()
     {
             System.out.println("New Thread");
-            if(client != null)
-                System.out.println("Client is alive");
             while (!Client.socket.isClosed()) {
                 Message message;
                 try {

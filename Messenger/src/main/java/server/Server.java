@@ -8,7 +8,7 @@ import message.Message;
 
 public class Server {
 
-    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, SQLException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
         ServerSocket serverSocket = new ServerSocket(8000);
         System.out.println("Server launched");
         Model model = new Model();
@@ -32,7 +32,7 @@ public class Server {
         }
     }
 
-    private static Socket clientAccept(ServerSocket serverSocket) throws IOException, ClassNotFoundException, SQLException {
+    private static Socket clientAccept(ServerSocket serverSocket) throws IOException {
         Socket socket = serverSocket.accept();
         return socket;
 
