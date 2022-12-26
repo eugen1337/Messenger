@@ -12,11 +12,12 @@ import java.net.Socket;
 public class Client {
 
     public static Socket socket;
-    public ObjectInputStream in;
-    public ObjectOutputStream out;
-    public Client() {
+    public static ObjectInputStream in;
+    public static ObjectOutputStream out;
+
+    public static void init() {
         try {
-            socket = new Socket("127.0.0.1", 8000);
+            socket = new Socket("176.196.126.138", 8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         }
@@ -26,13 +27,12 @@ public class Client {
         }
     }
 
-    public void send(Message message) throws IOException {
+    public static void send(Message message) throws IOException {
         out.writeObject(message);
         out.flush();
     }
 
-    public Message receive() throws IOException, ClassNotFoundException {
+    public static Message receive() throws IOException, ClassNotFoundException {
         return (Message) in.readObject();
     }
-
 }

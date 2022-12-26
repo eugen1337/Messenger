@@ -2,6 +2,7 @@ package client.messenger.controllers;
 
 import client.messenger.Client;
 import client.messenger.HelloApplication;
+import client.messenger.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,12 +12,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import message.Message;
 
 import java.io.IOException;
 
 public class LoginController {
-    private static Client client;
     @FXML
     private TextField login;
     @FXML
@@ -26,48 +25,13 @@ public class LoginController {
     @FXML
     private Button register;
 
-    public void initialize() throws IOException {
-        client = new Client();
+    public void initialize() {
+        Client.init();
     }
 
     @FXML
-    public void onLoginClicked(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
-
-        System.out.println("LOLOLOL");
-        //new Thread(() -> {
-        String str = login.getText();
-        System.out.println(str);
-        if(login.getText().isEmpty() || password.getText().isEmpty()) {
-            info.setText("Введите правильные данные");
-            System.out.println("KEKEKE");
-        }
-        else {
-            System.out.println("ELSE");
-            Message message = new Message("logging");
-            try {
-                client.send(message);
-                message = new Message(login.getText());
-                client.send(message);
-                message = new Message(password.getText());
-                client.send(message);
-                if (client.receive().getText().equals("success")) {
-                    Stage stage = (Stage) login.getScene().getWindow();
-                    FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main.fxml"));
-                    Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-                    stage.setTitle("Missenger");
-                    stage.setScene(scene);
-                    MainController controller = fxmlLoader.getController();
-                    controller.setClient(client);
-                }
-                else {
-                    info.setText("Такого пользователя не существует или пароль неверный");
-                }
-            }
-            catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        //});
+    public void onLoginClicked(ActionEvent actionEvent) {
+        Model.login(login, password, info);
     }
 
     @FXML
@@ -77,7 +41,5 @@ public class LoginController {
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("Missenger: Регистрация");
         stage.setScene(scene);
-        RegisterController controller = fxmlLoader.getController();
-        controller.setClient(client);
     }
 }

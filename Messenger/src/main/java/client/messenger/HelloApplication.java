@@ -24,9 +24,7 @@ public class HelloApplication extends Application {
                 throw new RuntimeException(ex);
             }
         });
-
         stage.show();
-
     }
 
     public static void main(String[] args) {
