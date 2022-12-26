@@ -14,6 +14,7 @@ public class Client {
     public static Socket socket;
     public static ObjectInputStream in;
     public static ObjectOutputStream out;
+    public static String login;
 
     public static void init() {
         try {
@@ -35,4 +36,6 @@ public class Client {
     public static Message receive() throws IOException, ClassNotFoundException {
         return (Message) in.readObject();
     }
+
+    public static void setLogin(String login) {Client.login = login;}
 }

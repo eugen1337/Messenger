@@ -1,44 +1,30 @@
 package client.messenger;
 
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import message.Message;
 import java.io.IOException;
-import javafx.scene.paint.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static client.messenger.Client.in;
 
 public class Model {
-    public static void login(TextField login, PasswordField password, Label info) {
+    public static void login(String login, String password, Updatable updater) {
         new Thread(() -> {
-            System.out.println("login");
-            if (login.getText().isEmpty() || password.getText().isEmpty()) {
-                Platform.runLater(() -> info.setText("Введите правильные данные"));
+            if (login.isEmpty() || password.isEmpty()) {
+                updater.addMessage("Введите правильные данные", "RED");
             } else {
                 try {
                     Client.send(new Message("logging"));
-                    Client.send(new Message(login.getText()));
-                    Client.send(new Message(password.getText()));
+                    Client.send(new Message(login));
+                    Client.send(new Message(password));
                     switch (Client.receive().getText()) {
-                        case "success" -> Platform.runLater(() -> {
-                            Stage stage = (Stage) login.getScene().getWindow();
-                            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main.fxml"));
-                            Scene scene = null;
-                            try {
-                                scene = new Scene(fxmlLoader.load(), 600, 400);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            stage.setTitle("Missenger");
-                            stage.setScene(scene);
-                        });
+                        case "success" -> updater.addMessage("success", "GREEN");
                         case "error" ->
-                                Platform.runLater(() -> info.setText("Такого пользователя не существует или пароль неверный"));
+                                updater.addMessage("Такого пользователя не существует или пароль неверный", "RED");
                         case "user is already logged in" ->
-                                Platform.runLater(() -> info.setText("Данный пользователь уже авторизован"));
+                                updater.addMessage("Данный пользователь уже авторизован", "RED");
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
@@ -47,41 +33,74 @@ public class Model {
         }).start();
     }
 
-    public static void register(TextField login, PasswordField password, PasswordField password1, Label info) {
+    public static void register(String login, String password, String password1, Updatable updater) {
         new Thread(() -> {
-            if (password.getText().equals(password1.getText())) {
+            if (password.equals(password1)) {
                 try {
                     Client.send(new Message("register"));
-                    Client.send(new Message(login.getText()));
-                    Client.send(new Message(password.getText()));
+                    Client.send(new Message(login));
+                    Client.send(new Message(password));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 try {
                     if (Client.receive().getText().equals("success")) {
-                        Platform.runLater(() -> {
-                            info.setTextFill(Color.GREEN);
-                            info.setText("Успешная регистрация");
-                        });
+                        updater.addMessage("Успешная регистрация", "GREEN");
                     }
                     else {
-                        Platform.runLater(() -> info.setText("Логин занят другим пользователем"));
+                        updater.addMessage("Логин занят другим пользователем", "RED");
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                Platform.runLater(() -> info.setText("Пароли не совпадают"));
+                updater.addMessage("Пароли не совпадают", "RED");
             }
         }).start();
+    }
+
+    public static void mainInit(Updatable updater) {
+        new Thread(() -> {
+            while(true) {
+                try {
+                    Client.send(new Message("/online"));
+                    ArrayList<String> A = new ArrayList<>();
+                    int n = (int) in.readObject();
+                    for (int i = 0; i < n; i++) {
+                        A.add(String.valueOf(in.readObject()));
+                    }
+                    for (String o : A) {
+                        updater.addMessage(o, "");
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    Thread.sleep(5*1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+        /*new Thread(() -> {
+
+        });*/
+    }
+
+    public static void sendMsg(String text, String name) throws IOException {
+        Client.send(new Message(text, name));
     }
 
     public static void shutdown() throws IOException {
         Client.socket.close();
     }
+
+    public interface Updatable {
+        public void addMessage(String str, String color);
+    }
 }
 
-class ClientThread extends Thread {
+/*class ClientThread extends Thread {
 
     Client client;
     Updatable updater;
@@ -100,7 +119,7 @@ class ClientThread extends Thread {
         while (!Client.socket.isClosed()) {
             Message message;
             try {
-                message = client.receive();
+                message = Client.receive();
                 updater.addMessage(message.getText());
             } catch (IOException e) {
                 System.out.println("Client is disconnected");
@@ -114,4 +133,4 @@ class ClientThread extends Thread {
     public interface Updatable {
         public void addMessage(String str);
     }
-}
+}*/
